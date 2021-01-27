@@ -2,6 +2,9 @@ import json
 import facebook as fb
 from datetime import datetime
 import pandas as pd
+import csv
+from pandas import json_normalize
+import os
 
 page_id='217328504988428'
 page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
@@ -29,10 +32,70 @@ def checkDict(jsonObject, prefix):
 
 def printField(df1, ele, prefix):
     #print (prefix, ":" , ele)
-    #df = pd.DataFrame(df1)
-    df = DataFrame (People_List, columns=['First_Name','Last_Name','Age'])
+    df = pd.DataFrame(df1)
+    #df = DataFrame (People_List, columns=['First_Name','Last_Name','Age'])
     df.to_csv('insights3.csv', index = False)
+
+def get_values(data):
+    devices = []
+
+    for datum in data:
+        for i in range(len(datum["values"])):
+            id = datum["id"]
+            name = datum["name"]
+            period = datum["period"]
+            title = datum["title"]
+            description = datum["description"]
+            value = datum["values"][i]["value"]
+            end_time = datum["values"][i]["end_time"]
+            devices.append([id, period, name, value, end_time, title, description])
+            
+    return devices
+
+def flatten_json(df, output_name):
+    flattened_data =[]
     
+    #display(df)
+    devices = get_values(df)
+
+    for device in devices:
+        id, period, name, value, end_time, title, description = device
+        flattened_data.append([id, period, name, value, end_time, title, description])
+    
+    json_to_csv(flattened_data, output_name)
+
+    return "FLATTENED DATA SAVED"
+
+def flatten_json2(y):
+    out = {}
+
+    def flatten(x, name=''):
+        if type(x) is dict:
+            for a in x:
+                flatten(x[a], name + a + '_')
+        elif type(x) is list:
+            i = 0
+            for a in x:
+                flatten(a, name + str(i) + '_')
+                i += 1
+        else:
+            out[str(name[:-1])] = str(x)
+
+    flatten(y)
+    return out
+
+def json_to_csv(normalized_df, csv_name):
+
+    header = ["id", "period", "name", "value", "end_time", "title", "description"]
+
+    with open(csv_name, 'wt', newline ='') as file:
+        writer = csv.writer(file, delimiter=',')
+        writer.writerow(i for i in header)
+        for j in normalized_df:
+            writer.writerow(j)
+        
+    return "FLATTENED DATA SAVED"
+
 if '__name__==__main__':
     page_insights = graph.get_connections(
                         id = page_id,
@@ -49,36 +112,21 @@ if '__name__==__main__':
     #df = pd.DataFrame(page_insights['data'])
     
     dfs = page_insights['data']
-    #print(df)
+    #display(dfs)
     
-    for df in dfs:
-        #print(df)
-        for element in df:
-            #If Json Field value is a Nested Json
-            if (isinstance(df[element], dict)):
-                checkDict(df[element], element)
-                
-            #If Json Field value is a list
-            elif (isinstance(df[element], list)):
-                checkList(df[element], element)
-                
-            #If Json Field value is a string
-            elif (isinstance(df[element], str)):
-                printField(df, df[element], element)
-
-    #print('OK')
-
+    #for df in dfs:
+    #    #print(df)
+    #    for element in df:
+    #        #If Json Field value is a Nested Json
+    #        if (isinstance(df[element], dict)):
+    #            checkDict(df[element], element)
+    #            
+    #        #If Json Field value is a list
+    #        elif (isinstance(df[element], list)):
+    #            checkList(df[element], element)
+    #            
+    #        #If Json Field value is a string
+    #        elif (isinstance(df[element], str)):
+    #            printField(df, df[element], element)
     
-    
-#multiple_level_data = pd.json_normalize(
-                            #page_insights, 
-                            #record_path = ['data'], 
-                            #meta =['name', 'period', 'title', 'description'], 
-                            #meta_prefix='config_params_'
-                            #record_prefix='dbscan_'
-                        #)
-#df = df.drop({'values'}, axis=1)
-
-# Saving to CSV format
-#df.to_csv('insights3.csv', index = False)
-#print('OK')
+    flatten_json(dfs, "my_flattened_file.csv")
