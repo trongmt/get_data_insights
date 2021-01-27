@@ -3,12 +3,12 @@ import facebook as fb
 from datetime import datetime
 import pandas as pd
 import csv
-from pandas import json_normalize
+from pandas.io.json import json_normalize
 import os
 
-page_id='217328504988428'
-page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
-graph = fb.GraphAPI(access_token=page_token, version="3.1")
+# page_id='217328504988428'
+# page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
+# graph = fb.GraphAPI(access_token=page_token, version="3.1")
 
 def checkList(ele, prefix):
     for i in range(len(ele)):
@@ -96,22 +96,26 @@ def json_to_csv(normalized_df, csv_name):
         
     return "FLATTENED DATA SAVED"
 
-if '__name__==__main__':
-    page_insights = graph.get_connections(
-                        id = page_id,
-                        connection_name = 'insights',
-                        metric = '''page_total_actions,page_views_total,page_preview_total,page_fan_adds_unique,
-                                    page_impressions_unique,page_post_engagements,page_video_views,
-                                    page_daily_follows_unique''',
-                        period = 'day',
-                        since = datetime(2019, 1, 1),
-                        until = datetime(2019, 1, 2),
-                        show_description_from_api_doc = False
-                )
+# if '__name__==__main__':
+#     page_insights = graph.get_connections(
+#                         id = page_id,
+#                         connection_name = 'insights',
+#                         metric = '''page_total_actions,page_views_total,page_preview_total,page_fan_adds_unique,
+#                                     page_impressions_unique,page_post_engagements,page_video_views,
+#                                     page_daily_follows_unique''',
+#                         period = 'day',
+#                         since = datetime(2019, 1, 1),
+#                         until = datetime(2019, 1, 2),
+#                         show_description_from_api_doc = False
+#                 )
     
-    #df = pd.DataFrame(page_insights['data'])
+#     #df = pd.DataFrame(page_insights['data'])
     
-    dfs = page_insights['data']
+#     dfs = page_insights['data']
+# đóng lại phần lấy dữ liệu từ facebook, dùng file json
+f = open("e:/github/get_data_insights/code/fb.json",)
+data=json.load(f)
+dfs=data["data"]
     #display(dfs)
     
     #for df in dfs:
@@ -129,4 +133,4 @@ if '__name__==__main__':
     #        elif (isinstance(df[element], str)):
     #            printField(df, df[element], element)
     
-    flatten_json(dfs, "my_flattened_file.csv")
+flatten_json(dfs,"flattened_file.csv")
