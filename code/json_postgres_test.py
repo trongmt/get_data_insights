@@ -15,11 +15,11 @@ page_id='217328504988428'
 page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
 graph = fb.GraphAPI(access_token=page_token, version="3.1")
 
-j_table = sqlalchemy.table("fb_data")                  
-    # drop existing records
-    # sql=f"delete from fb_data where end_time between '{from_date}' and '{to_date}'"
+# j_table = sqlalchemy.table("fb_data")                  
+#     # drop existing records
+#     # sql=f"delete from fb_data where end_time between '{from_date}' and '{to_date}'"
 
-find = engine.execute(j_table.delete())
+# find = engine.execute(j_table.delete())
 
 def get_values(data):
     devices = []
@@ -62,8 +62,8 @@ def delete(from_date, to_date):
     return find
 
 if '__name__==__main__':
-    from_date = datetime(2018, 2, 31)
-    to_date = datetime(2019, 3, 1)
+    from_date = datetime(2020, 2, 27)
+    to_date = datetime(2020, 5, 1)
     page_insights = graph.get_connections(
                         id = page_id,
                         connection_name = 'insights',
