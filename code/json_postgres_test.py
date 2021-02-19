@@ -62,8 +62,8 @@ def delete(from_date, to_date):
     return find
 
 if '__name__==__main__':
-    from_date = datetime(2020, 2, 27)
-    to_date = datetime(2020, 5, 1)
+    from_date = datetime(2020, 8, 31)
+    to_date = datetime(2020, 11, 1)
     page_insights = graph.get_connections(
                         id = page_id,
                         connection_name = 'insights',
