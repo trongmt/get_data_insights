@@ -21,11 +21,12 @@ def get_values(data):
     devices = []
 
     for datum in data:
-        # for i in range(len(datum["values"])):
-            created_time = datum["created_time"]
-            message = datum["message"]
-            id = datum["id"]
-            devices.append([created_time,message,id])
+        if len(datum) > 2:
+            if 'message' in datum:
+                created_time = datum["created_time"]
+                message = datum['message']
+                id = datum["id"]
+                devices.append([created_time,message,id])
             
     return devices
 
@@ -55,15 +56,16 @@ def data_sql(flat):
 
 if '__name__==__main__':
 
-    from_date = datetime(2020,1,1)
-    to_date = datetime(2020,1,15)
+    from_date = datetime(2021,1,1)
+    to_date = datetime(2021,1,31)
 
     posts = graph.get_connections(         
             id=page_id,
             connection_name="posts",
            # fields="type, name, created_time, object_id", (#12) name field is deprecated for versions v3.3 and higher
             since = from_date,
-            until = to_date
+            until = to_date,
+            show_description_from_api_doc = False
     )
 
 dp = posts['data']
