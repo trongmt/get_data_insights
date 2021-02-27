@@ -96,15 +96,8 @@ def data_sql(flat):
 #     find = engine.execute(sql)
 #     return find
 
-
-if '__name__==__main__':
-
-    posts=get_post(2019,1)
-    p = flatten_json_post(posts['data'])
-    for each in p:
-            post_id = each[2]
-            # print(post_id)
-            post_insights=graph.get_connections(
+def get_post_insights(post_id):
+    return graph.get_connections(
             id=post_id,
             connection_name="insights",
             metric='''post_engaged_users,post_negative_feedback,post_negative_feedback_unique,post_engaged_fan,post_clicks,post_clicks_unique,
@@ -121,7 +114,21 @@ if '__name__==__main__':
             show_description_from_api_doc=False,
         )
 
-dfs = post_insights['data']
-flat=flatten_json(dfs)
-data_sql(flat)
+if '__name__==__main__':
+
+    posts=get_post(2019,2)
+    p = flatten_json_post(posts['data'])
+    # print(type(p))
+    for i in range(len(p)):
+            post_id = p[i][2]
+            # print(post_id)
+            post_insight = get_post_insights(post_id)
+            dfs = post_insight['data']
+            flat=flatten_json(dfs)
+            data_sql(flat)
+
+
+# print(dfs)
+
+
 # print(type(flat))

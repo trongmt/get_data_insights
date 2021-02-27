@@ -56,6 +56,16 @@ def data_sql(flat):
 
     json_dataframe.to_sql('posts', engine, if_exists='append', index=False,dtype={"date": DateTime(),"message":String(),"id":String()})
 
+# def get_post(year,month):
+#     last_day_in_month = calendar.monthrange(year, month)[1]    
+#     return  graph.get_connections(         
+#             id=page_id,
+#             connection_name="posts",
+#            # fields="type, name, created_time, object_id", (#12) name field is deprecated for versions v3.3 and higher
+#             since=datetime(year, month, 1, 0, 0, 0),
+#             until=datetime(year, month, last_day_in_month, 0, 0, 0),
+#             show_description_from_api_doc = False
+
 if '__name__==__main__':
 
     from_date = datetime(2021,1,1)
