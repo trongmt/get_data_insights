@@ -24,9 +24,11 @@ def get_values(data):
         if len(datum) > 2:
             if 'message' in datum:
                 created_time = datum["created_time"]
+                created_time = created_time.split('T')
+                date = created_time[0]
                 message = datum['message']
                 id = datum["id"]
-                devices.append([created_time,message,id])
+                devices.append([date,message,id])
             
     return devices
 
@@ -37,22 +39,22 @@ def flatten_json(df):
     devices = get_values(df)
 
     for device in devices:
-        created_time,message,id = device
-        flattened_data.append([created_time,message,id])
+        date,message,id = device
+        flattened_data.append([date,message,id])
     return flattened_data
 
 def delete(from_date, to_date):
     j_table = sqlalchemy.table("posts")                  
     # drop existing records
-    sql=f"delete from posts where created_time between '{from_date}' and '{to_date}'"
+    sql=f"delete from posts where date between '{from_date}' and '{to_date}'"
 
     find = engine.execute(sql)
     return find
 
 def data_sql(flat):
-    json_dataframe=pd.DataFrame(flat,columns= ["created_time","message","id"])
+    json_dataframe=pd.DataFrame(flat,columns= ["date","message","id"])
 
-    json_dataframe.to_sql('posts', engine, if_exists='append', index=False,dtype={"created_time": DateTime(),"message":String(),"id":String()})
+    json_dataframe.to_sql('posts', engine, if_exists='append', index=False,dtype={"date": DateTime(),"message":String(),"id":String()})
 
 if '__name__==__main__':
 
