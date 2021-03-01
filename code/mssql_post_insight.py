@@ -3,29 +3,25 @@ import facebook as fb
 from datetime import datetime
 import pandas as pd
 from pandas.io.json import json_normalize
-import csv
-from IPython.display import display
-from sqlalchemy import create_engine
-import psycopg2
-import sqlalchemy
+#import csv
+#from IPython.display import display
+#from sqlalchemy import create_engine
+import pyodbc
 import calendar
-from sqlalchemy.types import String, Integer, Numeric, Float, DateTime
-engine = create_engine('postgresql://postgres:postgres@localhost:5432/fb_data')
 
 page_id='217328504988428'
 page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
 graph = fb.GraphAPI(access_token=page_token, version="3.1")
 
-# from_date = datetime(2021,1,1)
-# to_date = datetime(2021,1,15)
 def get_post(year,month):
-    last_day_in_month = calendar.monthrange(year, month)[1]    
+    last_day_in_month = calendar.monthrange(year, month)[1]
+    #print(last_day_in_month)
     return  graph.get_connections(         
             id=page_id,
             connection_name="posts",
            # fields="type, name, created_time, object_id", (#12) name field is deprecated for versions v3.3 and higher
             since=datetime(year, month, 1, 0, 0, 0),
-            until=datetime(year, month, last_day_in_month, 0, 0, 0),
+            until=datetime(year, month, last_day_in_month, 23, 59, 59),
             show_description_from_api_doc = False
     )
 def get_values_post(data):
@@ -37,9 +33,6 @@ def get_values_post(data):
                 created_time = datum["created_time"]
                 message = datum['message']
                 id = datum["id"]
-                # id = id.split('_')
-                # id_page = id[0]
-                # id_post = id[1]
                 devices.append([created_time,message,id])
         
     return devices
@@ -51,6 +44,7 @@ def flatten_json_post(df):
     devices = get_values_post(df)
 
     for device in devices:
+        #print(device)
         created_time,message,id = device
         flattened_data.append([created_time,message,id])
     return flattened_data
@@ -82,18 +76,38 @@ def flatten_json(df):
         flattened_data.append([id, period, name, value, title, description])
     return flattened_data
 
-def data_sql(flat):
-    json_dataframe=pd.DataFrame(flat,columns= ["id", "period", "name", "value", "title", "description"])
 
-    json_dataframe.to_sql('post_insight', engine, if_exists='append', index=False,dtype={"id": String(),  "period":String(), "name":String(), "value":Integer(),"title":String(), "description":String()})
+def save_to_sql(flat):
+    # json_dataframe=pd.DataFrame(flat,columns= ["id", "period", "name", "value", "end_time", "title", "description"])
+    # print(type(flat))
+    conn = pyodbc.connect('Driver={SQL Server};'
+                      'Server=localhost;'
+                      'Database=fb_snp;'
+                      'Trusted_Connection=yes;')
+    cursor = conn.cursor()
+    for row in flat:
+        # print(row)
+        sql = "insert into dbo.post_insight (id, period, name, value, title, description) values (?,?,?,?,?,?) "
+        # if isinstance(row[3], dict):
+        #     value = ', '.join(row[3].keys())
+        # else:
+        #     value = row[3]
+        insert_news=(row[0], row[1], row[2], row[3], row[4], row[5])
+        cursor.execute(sql, insert_news)
+        # cursor.executemany("insert into fb_snp.fb_data[id], [period], [name], [value], [end_time], [title], [description]) values (%('id')s, %('period')s, %('name')s, %('value')s, %('end_time')s,%('title')s,%('description')s",tuple(row))
+        conn.commit()
 
 # def delete(from_date, to_date):
-#     j_table = sqlalchemy.table("post_insight")                  
+#     conn = pyodbc.connect('Driver={SQL Server};'
+#                       'Server=localhost;'
+#                       'Database=fb_snp;'
+#                       'Trusted_Connection=yes;')
+#     cursor = conn.cursor()                 
 #     # drop existing records
-#     sql=f"delete from post_insight 
-#           where end_time between '{from_date}' and '{to_date}'"
-
-#     find = engine.execute(sql)
+#     sql=f"delete from dbo.post_insight where date between '{from_date}' and '{to_date}'"
+#     # print(sql)
+#     find = cursor.execute(sql)
+#     conn.commit()
 #     return find
 
 def get_post_insights(post_id):
@@ -116,19 +130,13 @@ def get_post_insights(post_id):
 
 if '__name__==__main__':
 
-    posts=get_post(2019,2)
+    posts=get_post(2019,1)
     p = flatten_json_post(posts['data'])
-    # print(type(p))
+    #print(posts)
     for i in range(len(p)):
             post_id = p[i][2]
-            # print(post_id)
-            post_insight = get_post_insights(post_id)
-            dfs = post_insight['data']
-            flat=flatten_json(dfs)
-            data_sql(flat)
-
-
-# print(dfs)
-
-
-# print(type(flat))
+            print(post_id)
+            # post_insight = get_post_insights(post_id)
+            # dfs = post_insight['data']
+            # flat=flatten_json(dfs)
+            # save_to_sql(flat)

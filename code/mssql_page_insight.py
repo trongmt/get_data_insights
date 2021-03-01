@@ -3,10 +3,9 @@ import facebook as fb
 from datetime import datetime
 import pandas as pd
 from pandas.io.json import json_normalize
-import csv
-from IPython.display import display
-from sqlalchemy import create_engine
-import psycopg2
+#import csv
+#from IPython.display import display
+#from sqlalchemy import create_engine
 import pyodbc
 
 page_id='217328504988428'
@@ -43,13 +42,15 @@ def save_to_sql(flat):
     # json_dataframe=pd.DataFrame(flat,columns= ["id", "period", "name", "value", "end_time", "title", "description"])
     # print(type(flat))
     conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=DESKTOP-3P6F3VK;'
+                      'Server=localhost;'
                       'Database=fb_snp;'
+                    #   'username = sa;' 
+                    #   'password = admin123$;'
                       'Trusted_Connection=yes;')
     cursor = conn.cursor()
     for row in flat:
         # print(row)
-        sql = "insert into dbo.fb_data (id, period, name, value, end_time, title, description) values (?,?,?,?,?,?,?) "
+        sql = "insert into dbo.page_insight (id, period, name, value, end_time, title, description) values (?,?,?,?,?,?,?) "
         
         # if isinstance(row[3], dict):
         #     value = ', '.join(row[3].keys())
@@ -62,12 +63,14 @@ def save_to_sql(flat):
 
 def delete(from_date, to_date):
     conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=DESKTOP-3P6F3VK;'
+                      'Server=localhost;'
                       'Database=fb_snp;'
+                    #   'username = sa;' 
+                    #   'password = admin123$;'
                       'Trusted_Connection=yes;')
     cursor = conn.cursor()                 
     # drop existing records
-    sql=f"delete from dbo.fb_data where end_time between '{from_date}' and '{to_date}'"
+    sql=f"delete from dbo.page_insight where end_time between '{from_date}' and '{to_date}'"
     # print(sql)
     find = cursor.execute(sql)
     conn.commit()
@@ -80,7 +83,7 @@ if '__name__==__main__':
     from_date = datetime(2018, 12, 31)
     to_date = datetime(2019, 4, 1)
 
-    #print(from_date)
+    # print(from_date)
     page_insights = graph.get_connections(
                         id = page_id,
                         connection_name = 'insights',
@@ -118,4 +121,5 @@ if '__name__==__main__':
     delete(from_date, to_date)
     flat=flatten_json(dfs)
     save_to_sql(flat)
+    print('OK')
 

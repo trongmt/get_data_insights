@@ -6,7 +6,7 @@ from pandas.io.json import json_normalize
 import csv
 from IPython.display import display
 from sqlalchemy import create_engine
-import psycopg2
+# import psycopg2
 import pyodbc
 
 def get_values(data):
@@ -68,7 +68,7 @@ if '__name__==__main__':
     to_date = datetime(2021, 1, 1)
 
     '''đoạn này chạy nhiều sợ facebook tưởng hack nên cho dô khuôn và thay bằng mở file json'''
-    f = open("e:/github/-Getting-Facebook-Data/code/fb.json",)
+    f = open("D:/github/get_data_insights/code/fb.json",)
     data=json.load(f)
     dfs=data["data"]
 
