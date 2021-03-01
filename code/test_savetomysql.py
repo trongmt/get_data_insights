@@ -57,6 +57,7 @@ def delete(from_date, to_date):
     cursor = conn.cursor()                 
     # drop existing records
     sql="delete from dbo.fb_data where end_time between '{from_date}' and '{to_date}'"
+    conn.commit()
     find = cursor.execute(sql)
     return find
 
