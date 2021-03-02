@@ -75,8 +75,8 @@ def delete(from_date, to_date):
 
 if '__name__==__main__':
 
-    from_date = datetime(2019,1,1)
-    to_date = datetime(2019,1,31)
+    from_date = datetime(2021,1,1)
+    to_date = datetime(2021,1,31)
 
     posts = graph.get_connections(         
             id=page_id,

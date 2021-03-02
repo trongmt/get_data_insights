@@ -55,6 +55,8 @@ def get_values(data):
     for datum in data:
         for i in range(len(datum["values"])):
             id = datum["id"]
+            id = id.split('/')
+            id = id[0]
             name = datum["name"]
             period = datum["period"]
             title = datum["title"]
@@ -130,13 +132,14 @@ def get_post_insights(post_id):
 
 if '__name__==__main__':
 
-    posts=get_post(2019,1)
+    posts=get_post(2021,1)
     p = flatten_json_post(posts['data'])
     #print(posts)
     for i in range(len(p)):
             post_id = p[i][2]
-            print(post_id)
-            # post_insight = get_post_insights(post_id)
-            # dfs = post_insight['data']
-            # flat=flatten_json(dfs)
-            # save_to_sql(flat)
+            # print(post_id)
+            post_insight = get_post_insights(post_id)
+            dfs = post_insight['data']
+            # print(dfs)
+            flat=flatten_json(dfs)
+            save_to_sql(flat)

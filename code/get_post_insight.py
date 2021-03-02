@@ -3,10 +3,9 @@ import facebook as fb
 from datetime import datetime
 import pandas as pd
 from pandas.io.json import json_normalize
-import csv
+# import csv
 from IPython.display import display
 from sqlalchemy import create_engine
-import psycopg2
 import sqlalchemy
 import calendar
 from sqlalchemy.types import String, Integer, Numeric, Float, DateTime
@@ -124,9 +123,9 @@ if '__name__==__main__':
             # print(post_id)
             post_insight = get_post_insights(post_id)
             dfs = post_insight['data']
-            flat=flatten_json(dfs)
-            data_sql(flat)
-
+            # flat=flatten_json(dfs)
+            # data_sql(flat)
+            print(dfs)
 
 # print(dfs)
 
