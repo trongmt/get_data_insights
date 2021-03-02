@@ -85,6 +85,7 @@ if '__name__==__main__':
                                     page_video_repeat_views,page_video_views_unique,page_video_complete_views_30s,page_video_complete_views_30s_autoplayed,
                                     page_video_complete_views_30s_click_to_play,page_video_complete_views_30s_repeat_views,page_video_complete_views_30s_unique,
                                     page_total_actions,page_get_directions_clicks_logged_in_unique,page_call_phone_clicks_logged_in_unique,page_website_clicks_logged_in_unique
+                                    ,page_cta_clicks_logged_in_total,page_cta_clicks_logged_in_unique
                                 ''',
                         period = 'day',
                         since = from_date,
@@ -96,8 +97,8 @@ if '__name__==__main__':
     # f = open("e:/github/-Getting-Facebook-Data/code/fb.json",)
     # data=json.load(f)
     # dfs=data["data"]
-
-    delete(from_date, to_date)
-    flat=flatten_json(dfs)
-    data_sql(flat)
+print(dfs)
+    # delete(from_date, to_date)
+    # flat=flatten_json(dfs)
+    # data_sql(flat)
 

@@ -107,7 +107,8 @@ def get_post_insights(post_id):
             post_video_complete_views_paid,post_video_complete_views_paid_unique,
             post_video_views_organic,post_video_views_organic_unique,
             post_video_views_paid,post_video_views_paid_unique,
-            post_video_length,post_video_views,post_video_views_unique
+            post_video_length,post_video_views,post_video_views_unique,
+            post_reactions_like_total, post_reactions_love_total
             ''',
             period="lifetime",
             show_description_from_api_doc=False,
