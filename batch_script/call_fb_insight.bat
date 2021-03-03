@@ -1,11 +1,11 @@
 @echo off
-cls
 
-for /f "tokens=1" %%i in ('date /t') do set thedate=%%i
+for /f "skip=1" %%x in ('wmic os get localdatetime') do if not defined MyDate set MyDate=%%x
+for /f %%x in ('wmic path win32_localtime get /format:list ^| findstr "="') do set %%x
 
-set mm=%thedate:~3,2%
-set dd=%thedate:~0,2%
-set yyyy=%thedate:~6,4%
+set mm=%Month%:~-2%
+set dd=%Day:~-2%
+set yyyy=%Year%
 
 REM Change the number below as needed:
 
@@ -65,4 +65,4 @@ set todate=%yyyy%-%mm%-%dd% 23:59:59
 
 echo fromdate: %fromdate%
 echo todate: %todate%
-python fb_insight.py '%fromdate%' '%todate%'
+python D:\GitHub\get_data_insights\code\mssql_page_insight.py '%fromdate%' '%todate%'

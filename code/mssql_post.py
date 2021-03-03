@@ -43,7 +43,7 @@ def save_to_sql(flat):
     # json_dataframe=pd.DataFrame(flat,columns= ["id", "period", "name", "value", "end_time", "title", "description"])
     # print(type(flat))
     conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=localhost;'
+                      'Server=SNP-CNTT-49119;'
                       'Database=fb_snp;'
                       'Trusted_Connection=yes;')
     cursor = conn.cursor()
@@ -61,7 +61,7 @@ def save_to_sql(flat):
 
 def delete(from_date, to_date):
     conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=localhost;'
+                      'Server=SNP-CNTT-49119;'
                       'Database=fb_snp;'
                       'Trusted_Connection=yes;')
     cursor = conn.cursor()                 
@@ -75,8 +75,8 @@ def delete(from_date, to_date):
 
 if '__name__==__main__':
 
-    from_date = datetime(2021,1,1)
-    to_date = datetime(2021,1,31)
+    from_date = datetime(2021,2,1)
+    to_date = datetime(2021,2,28)
 
     posts = graph.get_connections(         
             id=page_id,

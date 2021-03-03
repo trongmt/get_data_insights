@@ -83,7 +83,7 @@ def save_to_sql(flat):
     # json_dataframe=pd.DataFrame(flat,columns= ["id", "period", "name", "value", "end_time", "title", "description"])
     # print(type(flat))
     conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=localhost;'
+                      'Server=SNP-CNTT-49119;'
                       'Database=fb_snp;'
                       'Trusted_Connection=yes;')
     cursor = conn.cursor()
@@ -104,20 +104,20 @@ def get_post_insights(post_id):
     return graph.get_connections(
             id=post_id,
             connection_name="insights",
-            # metric='''post_engaged_users,post_negative_feedback,post_negative_feedback_unique,post_engaged_fan,post_clicks,post_clicks_unique,
-            # post_impressions,post_impressions_unique,post_impressions_paid,
-            # post_impressions_paid_unique,post_impressions_fan,post_impressions_fan_unique,
-            # post_impressions_fan_paid,post_impressions_fan_paid_unique,post_impressions_organic,post_impressions_organic_unique,
-            # post_video_avg_time_watched,post_video_complete_views_organic,post_video_complete_views_organic_unique,
-            # post_video_complete_views_paid,post_video_complete_views_paid_unique,
-            # post_video_views_organic,post_video_views_organic_unique,
-            # post_video_views_paid,post_video_views_paid_unique,
-            # post_video_length,post_video_views,post_video_views_unique
-            # ''',
-            metric = '''
-            
-            
+            metric='''post_engaged_users,post_negative_feedback,post_negative_feedback_unique,post_engaged_fan,post_clicks,post_clicks_unique,
+            post_impressions,post_impressions_unique,post_impressions_paid,
+            post_impressions_paid_unique,post_impressions_fan,post_impressions_fan_unique,
+            post_impressions_fan_paid,post_impressions_fan_paid_unique,post_impressions_organic,post_impressions_organic_unique,
+            post_video_avg_time_watched,post_video_complete_views_organic,post_video_complete_views_organic_unique,
+            post_video_complete_views_paid,post_video_complete_views_paid_unique,
+            post_video_views_organic,post_video_views_organic_unique,
+            post_video_views_paid,post_video_views_paid_unique,
+            post_video_length,post_video_views,post_video_views_unique
             ''',
+            # metric = '''
+            
+            
+            # ''',
             period="lifetime",
             show_description_from_api_doc=False,
         )

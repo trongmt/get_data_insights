@@ -3,6 +3,7 @@ import facebook as fb
 from datetime import datetime
 import pandas as pd
 from pandas.io.json import json_normalize
+import sys
 #import csv
 #from IPython.display import display
 #from sqlalchemy import create_engine
@@ -42,7 +43,7 @@ def save_to_sql(flat):
     # json_dataframe=pd.DataFrame(flat,columns= ["id", "period", "name", "value", "end_time", "title", "description"])
     # print(type(flat))
     conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=localhost;'
+                      'Server=SNP-CNTT-49119;'
                       'Database=fb_snp;'
                     #   'username = sa;' 
                     #   'password = admin123$;'
@@ -63,7 +64,7 @@ def save_to_sql(flat):
 
 def delete(from_date, to_date):
     conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=localhost;'
+                      'Server=SNP-CNTT-49119;'
                       'Database=fb_snp;'
                     #   'username = sa;' 
                     #   'password = admin123$;'
@@ -80,9 +81,10 @@ def delete(from_date, to_date):
 if '__name__==__main__':
     # from_date = datetime(2020, 8, 31)
     # to_date = datetime(2020, 11, 1)
-    from_date = datetime(2018, 12, 31)
-    to_date = datetime(2019, 4, 1)
-
+    from_date = datetime(2021, 1, 1)
+    to_date = datetime(2021, 1, 2)
+    # from_date=sys.argv[1]
+    # to_date=sys.argv[2]
     # print(from_date)
     page_insights = graph.get_connections(
                         id = page_id,
