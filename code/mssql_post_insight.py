@@ -8,10 +8,12 @@ from pandas.io.json import json_normalize
 #from sqlalchemy import create_engine
 import pyodbc
 import calendar
+import sys
+import requests
 
 page_id='217328504988428'
 page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
-graph = fb.GraphAPI(access_token=page_token, version="3.1")
+# graph = fb.GraphAPI(access_token=page_token, version="3.1")
 
 def get_post(year,month):
     last_day_in_month = calendar.monthrange(year, month)[1]
@@ -123,8 +125,20 @@ def get_post_insights(post_id):
         )
 
 if '__name__==__main__':
+    proxies = {
+        "http": "172.16.0.53:8080",
+        "https": "172.16.0.53:8080"
+    }
 
-    posts=get_post(2021,1)
+    #headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Safari/537.36'}
+    # js = requests.get('https://graph.facebook.com/v10.0/217328504988428/insights?access_token=EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD&period=day&metric=page_views_total,page_post_engagements,page_fans,page_fan_adds_unique', proxies=proxies, headers=headers, verify=False)
+    # print(js.status_code)
+    # print(js.text)
+
+    # print(from_date)
+    graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
+
+    posts=get_post(2021,2)
     p = flatten_json_post(posts['data'])
     #print(posts)
     for i in range(len(p)):
