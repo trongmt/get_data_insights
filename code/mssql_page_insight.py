@@ -82,8 +82,8 @@ if '__name__==__main__':
 
     #from_date=sys.argv[1]
     #to_date=sys.argv[2]
-    from_date = datetime(2021, 1, 2)
-    to_date = datetime(2021, 1, 3)
+    from_date = datetime(2020, 12, 31)
+    to_date = datetime(2021, 3, 1)
     proxies = {
         "http": "172.16.0.53:8080",
         "https": "172.16.0.53:8080"
