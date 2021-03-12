@@ -107,12 +107,8 @@ def get_post_insights(post_id):
             id=post_id,
             connection_name="insights",
             metric='''
-            post_reactions_like_total,
-            post_reactions_love_total,
-            post_reactions_wow_total,
-            post_reactions_haha_total,
-            post_reactions_sorry_total,
-            post_reactions_anger_total,
+            post_activity,
+            post_activity_unique,
 
             ''',
             # metric = '''
@@ -137,7 +133,7 @@ if '__name__==__main__':
     # print(from_date)
     graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
 
-    posts=get_post(2020,12)
+    posts=get_post(2021,2)
     p = flatten_json_post(posts['data'])
     # print(posts)
     for i in range(len(p)):
