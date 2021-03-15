@@ -91,7 +91,7 @@ def save_to_sql(flat):
     cursor = conn.cursor()
     for row in flat:
         # print(row)
-        sql = "insert into dbo.post_insight (id, period, name, value, title, description) values (?,?,?,?,?,?) "
+        sql = "insert into dbo.post_insight_test (id, period, name, value, title, description) values (?,?,?,?,?,?) "
         # if isinstance(row[3], dict):
         #     value = ', '.join(row[3].keys())
         # else:
@@ -114,7 +114,15 @@ def get_post_insights(post_id):
             post_video_complete_views_paid,post_video_complete_views_paid_unique,
             post_video_views_organic,post_video_views_organic_unique,
             post_video_views_paid,post_video_views_paid_unique,
-            post_video_length,post_video_views,post_video_views_unique
+            post_video_length,post_video_views,post_video_views_unique,
+            post_activity,
+            post_activity_unique,
+            post_reactions_like_total,
+            post_reactions_love_total,
+            post_reactions_wow_total,
+            post_reactions_haha_total,
+            post_reactions_sorry_total,
+            post_reactions_anger_total,
             ''',
             # metric = '''
             
@@ -138,7 +146,7 @@ if '__name__==__main__':
     # print(from_date)
     graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
 
-    posts=get_post(2021,2)
+    posts=get_post(2020,4)
     p = flatten_json_post(posts['data'])
     #print(posts)
     for i in range(len(p)):
