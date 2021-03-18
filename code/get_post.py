@@ -61,7 +61,7 @@ def data_sql(flat):
 #     return  graph.get_connections(         
 #             id=page_id,
 #             connection_name="posts",
-#            # fields="type, name, created_time, object_id", (#12) name field is deprecated for versions v3.3 and higher
+#            fields="type, name, created_time, object_id", (#12) name field is deprecated for versions v3.3 and higher
 #             since=datetime(year, month, 1, 0, 0, 0),
 #             until=datetime(year, month, last_day_in_month, 0, 0, 0),
 #             show_description_from_api_doc = False
@@ -74,13 +74,13 @@ if '__name__==__main__':
     posts = graph.get_connections(         
             id=page_id,
             connection_name="posts",
-           # fields="type, name, created_time, object_id", (#12) name field is deprecated for versions v3.3 and higher
+            fields="type, name, created_time, object_id", #12) name field is deprecated for versions v3.3 and higher
             since = from_date,
             until = to_date,
-            show_description_from_api_doc = False
-    )
+            show_description_from_api_doc = False)
 
 dp = posts['data']
-delete(from_date,to_date)
-p = flatten_json(dp)
-data_sql(p)
+# delete(from_date,to_date)
+# p = flatten_json(dp)
+# data_sql(p)
+print(dp)
