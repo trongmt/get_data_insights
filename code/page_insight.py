@@ -93,6 +93,7 @@ if '__name__==__main__':
                                     page_fans,
                                     page_impressions_unique,
                                     page_impressions_paid_unique,
+                                    page_impressions_organic_unique,
                                     page_engaged_users,
                                     page_consumptions,
                                     page_post_engagements,

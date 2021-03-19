@@ -10,7 +10,7 @@ page_fan_adds_unique,
 page_fan_removes_unique,
 page_fans_gender_age,
 page_impressions_paid_unique,
-
+page_impressions_organic_unique
 
 post insights
 post_activity_by_action_type
