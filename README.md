@@ -31,3 +31,11 @@ https://www.w3schools.com/python/ref_requests_get.asp
 https://developers.facebook.com/docs/marketing-api/insights/
 
 https://drgabrielharris.medium.com/python-how-making-facebook-api-calls-using-facebook-sdk-ea18bec973c8
+
+# link facebook graph api liên quan
+https://developers.facebook.com/docs/graph-api/reference/v3.1/post
+https://developers.facebook.com/docs/graph-api/reference/v10.0/insights
+
+#ver1 - 19/03/2021:
+-các bản code chính: page_insight, post, page_fans_gender_age
+-code đang edit: post_activity_action_by_type, post_consumptions_by_type(chưa biết)
