@@ -8,7 +8,7 @@ import calendar
 
 page_id='217328504988428'
 page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
-graph = fb.GraphAPI(access_token=page_token, version="3.1")
+# graph = fb.GraphAPI(access_token=page_token, version="3.1")
 
 def get_post(year,month):
     last_day_in_month = calendar.monthrange(year, month)[1]
@@ -109,6 +109,13 @@ def get_post_insights(post_id):
 
 if '__name__==__main__':
 #bên post đã làm được delete year and month bỏ drop constraint, bên này vẫn giữ constraint 
+ # proxies = {
+    #     "http": "172.16.0.53:8080",
+    #     "https": "172.16.0.53:8080"
+    # }
+
+    # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
+    graph = fb.GraphAPI(access_token=page_token, version="3.1")
     posts=get_post(2021,1)
     p = flatten_json_post(posts['data'])
     #print(posts)
