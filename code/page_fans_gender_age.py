@@ -38,10 +38,12 @@ def get_values(data):
             M5 = value["M.45-54"]
             M6 = value["M.55-64"]
             M7 = value["M.65+"]
-            U1 = value["U.18-24"]
-            U2 = value["U.25-34"]
-            U3 = value["U.35-44"]
-            devices.append([id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7,U1,U2,U3])
+            # U1 = value["U.13-17"]
+            # U2 = value["U.18-24"]
+            # U3 = value["U.25-34"]
+            # U4 = value["U.35-44"]
+            devices.append([id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7])
+            # devices.append([id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7,U1,U2,U3,U4])
             # F.13-17,F.18-24,F.25-34,F.35-44,F.45-54,F.55-64,F.65+,M.13-17,M.18-24,M.25-34,M.35-44,M.45-54,M.55-64,M.65+,U.18-24,U.25-34,U.35-44
     return devices
 
@@ -50,8 +52,8 @@ def flatten_json(df):
     #display(df)
     devices = get_values(df)
     for device in devices:
-        id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7,U1,U2,U3 = device
-        flattened_data.append([id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7,U1,U2,U3])
+        id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7 = device
+        flattened_data.append([id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7])
     return flattened_data
 
 
@@ -67,13 +69,13 @@ def save_to_sql(flat):
     cursor = conn.cursor()
     for row in flat:
         # print(row)
-        sql = "insert into dbo.page_fans_gender_age (id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7,U1,U2,U3) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        sql = "insert into dbo.page_fans_gender_age (id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
         
         # if isinstance(row[3], dict):
         #     value = ', '.join(row[3].keys())
         # else:
         #     value = row[3]
-        insert_news=(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19], row[20], row[21], row[22])
+        insert_news=(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19])
         cursor.execute(sql, insert_news)
         # cursor.executemany("insert into fb_snp.fb_data[id], [period], [name], [value], [end_time], [title], [description]) values (%('id')s, %('period')s, %('name')s, %('value')s, %('end_time')s,%('title')s,%('description')s",tuple(row))
         conn.commit()

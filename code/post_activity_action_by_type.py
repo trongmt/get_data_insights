@@ -59,10 +59,42 @@ def get_values(data):
             title = datum["title"]
             description = datum["description"]
             value = datum["values"][i]["value"]
-            share = value["share"]
-            like = value["like"]
-            comment = value["comment"]
+            # share = value["share"]
+            # like = value["like"]
+            # comment = value["comment"]
             # end_time = datum["values"][i]["end_time"]
+            if len(value) == 3:
+                share= value["share"]
+                like= value["like"]
+                comment= value["comment"]
+                # print(value)
+            elif len(value) == 2:
+                share= 0
+                like=0
+                comment=0
+                # print(value)
+                if 'share' not in value: 
+                    like= value["like"]
+                    comment= value["comment"]
+                elif 'like' not in value:
+                    share= value["share"]
+                    comment= value["comment"]
+                elif 'comment' not in value:
+                    share= value["share"]
+                    like= value["like"]
+                # devices.append([id, period, name, title, description, s, l, c])
+            elif len(value)==1:
+                share= 0
+                like=0
+                comment=0
+                # print(value)
+                if 'share' in value: 
+                    share= value["share"]
+                elif 'like' in value:
+                    like= value["like"]
+                elif 'comment'in value:
+                    comment= value["comment"]
+                # devices.append([id, period, name, title, description, s, l, c])
             devices.append([id, period, name, title, description, share, like, comment])
             
     return devices
@@ -87,7 +119,7 @@ def save_to_sql(flat):
     cursor = conn.cursor()
     for row in flat:
         # print(row)
-        sql = "insert into dbo.post_activity_by_action_type (id, period, name, title, description, share, like, comment) values (?,?,?,?,?,?,?,?) "
+        sql = "insert into dbo.post_activity_by_action_type (id, period, name, title, description, share, [like], comment) values (?,?,?,?,?,?,?,?) "
         # if isinstance(row[3], dict):
         #     value = ', '.join(row[3].keys())
         # else:
@@ -108,7 +140,7 @@ def get_post_insights(post_id):
         )
 
 if '__name__==__main__':
-#bên post đã làm được delete year and month bỏ drop constraint, bên này vẫn giữ constraint 
+#bên post đã làm được delete year and month bỏ drop constraint, bên này vẫn giữ constraint để tránh bị trùng
  # proxies = {
     #     "http": "172.16.0.53:8080",
     #     "https": "172.16.0.53:8080"
@@ -116,7 +148,7 @@ if '__name__==__main__':
 
     # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
     graph = fb.GraphAPI(access_token=page_token, version="3.1")
-    posts=get_post(2021,1)
+    posts=get_post(2021,2)
     p = flatten_json_post(posts['data'])
     #print(posts)
     for i in range(len(p)):
