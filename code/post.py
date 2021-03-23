@@ -94,8 +94,8 @@ if '__name__==__main__':
     # print(from_date)
     # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
     graph = fb.GraphAPI(access_token=page_token, version="3.1")
-    year = 2021
-    month = 1
+    year = 2019
+    month = 3
     dp=get_post(year,month)
 # dp = posts['data']
     delete(year,month)

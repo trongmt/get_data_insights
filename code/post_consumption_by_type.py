@@ -58,12 +58,8 @@ def get_values(data):
             period = datum["period"]
             title = datum["title"]
             description = datum["description"]
-            value = datum["values"][i]["value"]
-            share = value["share"]
-            like = value["like"]
-            comment = value["comment"]
-            # end_time = datum["values"][i]["end_time"]
-            devices.append([id, period, name, title, description, share, like, comment])
+            
+            devices.append([id, period, name, title, description])
             
     return devices
 
@@ -74,8 +70,8 @@ def flatten_json(df):
     devices = get_values(df)
 
     for device in devices:
-        id, period, name, title, description, share, like, comment= device
-        flattened_data.append([id, period, name, title, description, share, like, comment])
+        id, period, name, title, description= device
+        flattened_data.append([id, period, name, title, description])
     return flattened_data
 
 
@@ -87,7 +83,7 @@ def save_to_sql(flat):
     cursor = conn.cursor()
     for row in flat:
         # print(row)
-        sql = "insert into dbo.post_activity_by_action_type (id, period, name, title, description, share, like, comment) values (?,?,?,?,?,?,?,?) "
+        sql = "insert into dbo.post_activity_by_action_type (id, period, name, title, description) values (?,?,?,?,?,?,?,?) "
         # if isinstance(row[3], dict):
         #     value = ', '.join(row[3].keys())
         # else:
@@ -102,7 +98,7 @@ def get_post_insights(post_id):
     return graph.get_connections(
             id=post_id,
             connection_name="insights",
-            metric = '''post_activity_by_action_type''',
+            metric = '''post_consumptions_by_type''',
             period="lifetime",
             show_description_from_api_doc=False,
         )
@@ -118,6 +114,6 @@ if '__name__==__main__':
             # print(post_id)
             post_insight = get_post_insights(post_id)
             dfs = post_insight['data']
-            # print(dfs)
-            flat=flatten_json(dfs)
-            save_to_sql(flat)
+            print(dfs)
+            # flat=flatten_json(dfs)
+            # save_to_sql(flat)

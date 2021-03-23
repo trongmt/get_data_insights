@@ -37,5 +37,5 @@ https://developers.facebook.com/docs/graph-api/reference/v3.1/post
 https://developers.facebook.com/docs/graph-api/reference/v10.0/insights
 
 #ver1 - 19/03/2021:
--các bản code chính: page_insight, post, page_fans_gender_age
--code đang edit: post_activity_action_by_type, post_consumptions_by_type(chưa biết)
+-các bản code chính: page_insight, post, page_fans_gender_age,post_activity_action_by_type
+-code đang edit: post_consumptions_by_type (blank)
