@@ -82,8 +82,8 @@ if '__name__==__main__':
     # }
     # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
     graph = fb.GraphAPI(access_token=page_token, version="3.1")
-    from_date = datetime(2018, 12, 31)
-    to_date = datetime(2019, 4, 1)
+    from_date = datetime(2020, 12, 30)
+    to_date = datetime(2021, 3, 1)
 
     # print(from_date)
     page_insights = graph.get_connections(
@@ -100,7 +100,7 @@ if '__name__==__main__':
                                     page_video_views,
                                     page_fan_adds_unique,
                                     page_fan_removes_unique,''',
-                        period = '''day''',
+                        period = 'day',
                         since = from_date,
                         until = to_date,
                         show_description_from_api_doc = False

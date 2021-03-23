@@ -104,14 +104,12 @@ def get_post_insights(post_id):
         )
 
 if '__name__==__main__':
-#bên post đã làm được delete year and month bỏ drop constraint, bên này vẫn giữ constraint 
     posts=get_post(2021,1)
     p = flatten_json_post(posts['data'])
-    #print(posts)
+    # get post_id from post
     for i in range(len(p)):
-            # print(i)
             post_id = p[i][2]
-            # print(post_id)
+            # use post_id to get post insight
             post_insight = get_post_insights(post_id)
             dfs = post_insight['data']
             print(dfs)

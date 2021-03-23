@@ -148,7 +148,7 @@ if '__name__==__main__':
 
     # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
     graph = fb.GraphAPI(access_token=page_token, version="3.1")
-    posts=get_post(2019,1)
+    posts=get_post(2020,3)
     p = flatten_json_post(posts['data'])
     #print(posts)
     for i in range(len(p)):
