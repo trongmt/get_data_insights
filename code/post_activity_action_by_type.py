@@ -63,39 +63,15 @@ def get_values(data):
             # like = value["like"]
             # comment = value["comment"]
             # end_time = datum["values"][i]["end_time"]
-            if len(value) == 3:
-                share= value["share"]
-                like= value["like"]
-                comment= value["comment"]
-                # print(value)
-            elif len(value) == 2:
-                share= 0
-                like=0
-                comment=0
-                # print(value)
-                if 'share' not in value: 
-                    like= value["like"]
-                    comment= value["comment"]
-                elif 'like' not in value:
-                    share= value["share"]
-                    comment= value["comment"]
-                elif 'comment' not in value:
-                    share= value["share"]
-                    like= value["like"]
-                # devices.append([id, period, name, title, description, s, l, c])
-            elif len(value)==1:
-                share= 0
-                like=0
-                comment=0
-                # print(value)
-                if 'share' in value: 
-                    share= value["share"]
-                elif 'like' in value:
-                    like= value["like"]
-                elif 'comment'in value:
-                    comment= value["comment"]
-                # devices.append([id, period, name, title, description, s, l, c])
-            devices.append([id, period, name, title, description, share, like, comment])
+            if len(value) >= 1:
+                #print(value)
+                #print(value['photo view'])
+
+                share = value['share'] if 'share' in value else 0
+                like = value['like'] if 'like' in value else 0
+                comment = value['comment'] if 'comment' in value else 0
+
+                devices.append([id, period, name, title, description, share, like, comment])
             
     return devices
 

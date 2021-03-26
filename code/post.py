@@ -71,7 +71,7 @@ def save_to_sql(flat):
 
 
 def delete(year,month):
-    last_day_in_month = calendar.monthrange(year, month)[1]
+    # last_day_in_month = calendar.monthrange(year, month)[1]
     conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=localhost;'
                       'Database=fb_snp;'
