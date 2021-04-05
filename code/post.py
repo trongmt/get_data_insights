@@ -16,7 +16,8 @@ def get_post(year,month):
     return  graph.get_connections(         
             id=page_id,
             connection_name="posts",
-           # fields="type, name, created_time, object_id", (#12) name field is deprecated for versions v3.3 and higher
+            # fields="type, name, created_time, object_id", 
+            # (12) name field is deprecated for versions v3.3 and higher
             since=datetime(year, month, 1, 0, 0, 0),
             until=datetime(year, month, last_day_in_month, 23, 59, 59),
             show_description_from_api_doc = False
@@ -94,8 +95,8 @@ if '__name__==__main__':
     # print(from_date)
     # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
     graph = fb.GraphAPI(access_token=page_token, version="3.1")
-    year = 2020
-    month = 10
+    year = 2021
+    month = 3
     dp=get_post(year,month)
 # dp = posts['data']
     delete(year,month)
