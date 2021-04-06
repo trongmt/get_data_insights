@@ -59,19 +59,13 @@ def get_values(data):
             title = datum["title"]
             description = datum["description"]
             value = datum["values"][i]["value"]
-            # share = value["share"]
-            # like = value["like"]
-            # comment = value["comment"]
-            # end_time = datum["values"][i]["end_time"]
             if len(value) >= 0:
-                #print(value)
-                #print(value['photo view'])
+                VideoPlay = value['video play'] if 'video play' in value else 0
+                OtherClicks = value['other clicks'] if 'other clicks' in value else 0
+                PhotoView = value['photo view'] if 'photo view' in value else 0
+                LinkClicks = value['link clicks'] if 'link clicks' in value else 0
 
-                share = value['share'] if 'share' in value else 0
-                like = value['like'] if 'like' in value else 0
-                comment = value['comment'] if 'comment' in value else 0
-
-                devices.append([id, period, name, title, description, share, like, comment])
+                devices.append([id, period, name, title, description, LinkClicks, OtherClicks, PhotoView, VideoPlay])
             
     return devices
 
@@ -82,8 +76,8 @@ def flatten_json(df):
     devices = get_values(df)
 
     for device in devices:
-        id, period, name, title, description, share, like, comment= device
-        flattened_data.append([id, period, name, title, description, share, like, comment])
+        id, period, name, title, description, LinkClicks, OtherClicks, PhotoView, VideoPlay= device
+        flattened_data.append([id, period, name, title, description, LinkClicks, OtherClicks, PhotoView, VideoPlay])
     return flattened_data
 
 
@@ -95,12 +89,12 @@ def save_to_sql(flat):
     cursor = conn.cursor()
     for row in flat:
         # print(row)
-        sql = "insert into dbo.post_activity_by_action_type (id, period, name, title, description, share, [like], comment) values (?,?,?,?,?,?,?,?) "
+        sql = "insert into dbo.post_clicks_by_type (id, period, name, title, description, LinkClicks, OtherClicks, PhotoView, VideoPlay) values (?,?,?,?,?,?,?,?,?) "
         # if isinstance(row[3], dict):
         #     value = ', '.join(row[3].keys())
         # else:
         #     value = row[3]
-        insert_news=(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
+        insert_news=(row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7],row[8])
         cursor.execute(sql, insert_news)
         # cursor.executemany("insert into fb_snp.fb_data[id], [period], [name], [value], [end_time], [title], [description]) values (%('id')s, %('period')s, %('name')s, %('value')s, %('end_time')s,%('title')s,%('description')s",tuple(row))
         conn.commit()
@@ -110,7 +104,7 @@ def get_post_insights(post_id):
     return graph.get_connections(
             id=post_id,
             connection_name="insights",
-            metric = '''post_activity_by_action_type''',
+            metric = '''post_clicks_by_type''',
             period="lifetime",
             show_description_from_api_doc=False,
         )
@@ -124,7 +118,7 @@ if '__name__==__main__':
 
     # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
     graph = fb.GraphAPI(access_token=page_token, version="3.1")
-    posts=get_post(2019,12)
+    posts=get_post(2019,4)
     p = flatten_json_post(posts['data'])
     #print(posts)
     for i in range(len(p)):
@@ -133,6 +127,6 @@ if '__name__==__main__':
             # print(post_id)
             post_insight = get_post_insights(post_id)
             dfs = post_insight['data']
-            # print(dfs)
+            print(dfs)
             flat=flatten_json(dfs)
             save_to_sql(flat)
