@@ -10,32 +10,19 @@ page_id='217328504988428'
 page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
 # graph = fb.GraphAPI(access_token=page_token, version="3.1")
 
-def get_post(year,month):
-    last_day_in_month = calendar.monthrange(year, month)[1]
-    #print(last_day_in_month)
-    return  graph.get_connections(         
-            id=page_id,
-            connection_name="posts",
-            # fields="type, name, created_time, object_id", 
-            # (12) name field is deprecated for versions v3.3 and higher
-            since=datetime(year, month, 1, 0, 0, 0),
-            until=datetime(year, month, last_day_in_month, 23, 59, 59),
-            show_description_from_api_doc = False
-    )
 
 def get_values(data):
     devices = []
 
-    for datum in data:
-        if len(datum) > 2:
-            if 'message' in datum:
-                created_time = datum["created_time"]
-                created_time = created_time.split('T')
-                date = created_time[0]
-                message = datum['message']
-                id = datum["id"]
-                devices.append([date,message,id])
-            
+    created_time = data["created_time"] if 'created_time' in data else ''
+    created_time = created_time.split('T')
+    date = created_time[0]
+    message = data["message"] if 'message' in data else ''
+    id = data["id"] if 'id' in data else ''
+    story = data["story"] if 'story' in data else ''
+
+    devices.append([date,message,story,id])
+
     return devices
 
 def flatten_json(df):
@@ -45,8 +32,9 @@ def flatten_json(df):
     devices = get_values(df)
 
     for device in devices:
-        date,message,id = device
-        flattened_data.append([date,message,id])
+        date,message,story,id = device
+        # print(device)
+        flattened_data.append([date,message,story,id])
     return flattened_data
 
 
@@ -60,31 +48,13 @@ def save_to_sql(flat):
     cursor = conn.cursor()
     for row in flat:
         # print(row)
-        sql = "insert into dbo.post (date,message,id) values (?,?,?) "
-        # if isinstance(row[3], dict):
-        #     value = ', '.join(row[3].keys())
-        # else:
-        #     value = row[3]
-        insert_news=(row[0], row[1], row[2])
+        sql = "insert into dbo.post (date,message,story,id) values (?,?,?,?) "
+        insert_news=(row[0], row[1], row[2], row[3])
         cursor.execute(sql, insert_news)
         # cursor.executemany("insert into fb_snp.fb_data[id], [period], [name], [value], [end_time], [title], [description]) values (%('id')s, %('period')s, %('name')s, %('value')s, %('end_time')s,%('title')s,%('description')s",tuple(row))
         conn.commit()
 
-
-def delete(year,month):
-    # last_day_in_month = calendar.monthrange(year, month)[1]
-    conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=localhost;'
-                      'Database=fb_snp;'
-                      'Trusted_Connection=yes;')
-    cursor = conn.cursor()
-    # sql=f"delete from dbo.post where date between '{from_date}' and '{to_date}'"
-    sql=f"delete from dbo.post where year(date)='{year}' and month(date)='{month}'"
-    # print(sql)
-    find = cursor.execute(sql)   
-    conn.commit()
-    return find
-# Co cach khac la set tren database cho id , date ko trung nhau thi minh khong phai lo van de chay lap thang do
+# Co cach khac la set constraint tren database cho id ko trung nhau thi minh khong phai lo van de chay lap thang do
 
 if '__name__==__main__':
     # proxies = {
@@ -95,10 +65,13 @@ if '__name__==__main__':
     # print(from_date)
     # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
     graph = fb.GraphAPI(access_token=page_token, version="3.1")
-    year = 2021
-    month = 3
-    dp=get_post(year,month)
-# dp = posts['data']
-    delete(year,month)
-    p = flatten_json(dp['data'])
-    save_to_sql(p)
+    posts = graph.get_all_connections(id=page_id,
+                                        connection_name='posts',
+                                        # fields='type, name, created_time, object_id',
+                                       since=datetime(2019, 1, 1))
+                                    #    until=datetime(2019,4,1))
+    # print(posts)
+    for ind, post in enumerate(posts):
+        p = flatten_json(post)
+        # print(p)
+        save_to_sql(p)

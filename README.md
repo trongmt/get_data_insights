@@ -37,5 +37,5 @@ https://developers.facebook.com/docs/graph-api/reference/v3.1/post
 https://developers.facebook.com/docs/graph-api/reference/v10.0/insights
 
 #ver1 - 19/03/2021:
--các bản code chính: page_insight, post, page_fans_gender_age,post_activity_action_by_type,page_consumptions_by_type
+-các bản code chính: page_insight, posts,post_insight, page_fans_gender_age,post_activity_action_by_type,post_clicks_by_type
 -power bi: SNP-fanpage-v1
