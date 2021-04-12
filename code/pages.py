@@ -1,5 +1,4 @@
-#!/home/hdfs/miniconda3/bin/python
-# /usr/bin/env python
+#!C:\ProgramData\Miniconda3
 # -*- coding: utf-8 -*-
 
 import json
@@ -44,7 +43,7 @@ class Pages:
 
         return devices
 
-    def FlattenJson(self, df):
+    def FlattenInsights(self, df):
         flattened_data =[]
         devices = self.ParserPageInsights(df)
 
@@ -84,7 +83,7 @@ class Pages:
                 devices.append([id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7])
         return devices
 
-    def flatten_json(self, df):
+    def FlattenFanGender(self, df):
         flattened_data =[]
         devices = self.ParserPageFanGender(df)
         
@@ -93,17 +92,48 @@ class Pages:
             flattened_data.append([id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7])
         return flattened_data
 
-    def SaveToDB(self, flat):
+    def ParserConsumption(self, data):
+        devices = []
+
+        for datum in data:
+            for i in range(len(datum["values"])):
+                id = datum["id"]
+                name = datum["name"]
+                period = datum["period"]
+                title = datum["title"]
+                description = datum["description"]
+                end_time = datum["values"][i]["end_time"]
+                end_time = end_time.split('T')
+                end_time = end_time[0]
+                value = datum["values"][i]["value"]
+
+                if len(value) >= 1:
+                    video_play = value['video play'] if 'video play' in value else 0
+                    other_clicks = value['other clicks'] if 'other clicks' in value else 0
+                    photo_view = value['photo view'] if 'photo view' in value else 0
+                    link_clicks = value['link clicks'] if 'link clicks' in value else 0
+
+                    devices.append([id, period, name, end_time, title, description, link_clicks, other_clicks, photo_view, video_play])
+    return devices
+
+    def FlattenConsumption(self, df):
+        flattened_data =[]
+        devices = get_values(df)
+
+        for device in devices:
+            id, period, name, end_time, title, description, link_clicks, other_clicks, photo_view, video_play = device
+            flattened_data.append([id, period, name, end_time, title, description, link_clicks, other_clicks, photo_view, video_play])
+        
+        return flattened_data
+        
+    def SaveToDB(self, sql, headers):
         conn = None
         try:
             # create a cursor object for execution
             conn = self.ConnectionSqlDb(conn_str_config)
             cur = conn.cursor()
 
-            for row in flat:
-                sql = "insert into dbo.page_insight (id, period, name, value, end_time, title, description) values (?,?,?,?,?,?,?) "
-                insert_news=(row[0], row[1], row[2], row[3], row[4], row[5], row[6])
-                cur.execute(sql, insert_news)
+            cur.execute(sql, headers)
             
             conn.commit()
             cur.close()
@@ -143,46 +173,65 @@ class Pages:
                     page_post_engagements,
                     page_video_views,
                     page_fan_adds_unique,
-                    page_fan_removes_unique'''            
+                    page_fan_removes_unique'''
         page_insights = self.GraphConnection(graph, page_id, 'insights', metric, 'day', from_date, to_date)
         
         dfs = page_insights['data']
         self.PrepareData('page_insight', from_date, to_date)
 
-        flat = self.FlattenJson(dfs)
-        self.SaveToDB(flat)
+        flat = self.FlattenInsights(dfs)
+        for row in flat:
+            sql = '''insert into dbo.page_insight 
+                           (id, period, name, value, end_time, title, description) 
+                    values (?,?,?,?,?,?,?)
+                '''
+            header = (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
-        return dfs
+            self.SaveToDB(sql, header)        
 
     def PageConsumptions(self, graph, from_date, to_date):
         page_insights = self.GraphConnection(graph, page_id, 'insights', 'page_consumptions_by_consumption_type', 'day', from_date, to_date)
 
-        # page_cta_clicks_logged_in_unique
         dfs = page_insights['data']
-
         self.PrepareData('page_consumptions_by_type', from_date, to_date)
-        return dfs
+        
+        flat = self.FlattenConsumption(dfs)
+        for row in flat:
+            sql = '''insert into dbo.page_consumptions_by_type 
+                               (id, period, name, end_time, title, description, link_clicks, other_clicks, photo_view, video_play)
+                        values (?,?,?,?,?,?,?,?,?,?)
+                '''        
+            header = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
+            
+            self.SaveToDB(sql, header)
+
 
     def PageFansGenderAge(self, graph, from_date, to_date):
         page_insights = self.GraphConnection(graph, page_id, 'insights', 'page_fans_gender_age', 'day', from_date, to_date)
 
-        # page_cta_clicks_logged_in_unique
         dfs = page_insights['data']
-
         self.PrepareData('page_fans_gender_age', from_date, to_date)
-        return dfs
+
+        flat = self.FlattenFanGender(dfs)
+        for row in flat:
+            sql = '''insert into dbo.page_fans_gender_age 
+                           (id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7) 
+                    values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                '''
+            header = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19])
+            
+            self.SaveToDB(sql, header)
 
     def GraphConnection(self, graph, page_id, connection_name, metric, period, from_date, to_date):
         page_insights = graph.get_connections(
-                        id = page_id,
-                        connection_name = connection_name,
-                        metric = metric,
-                        period = period,
-                        since = from_date,
-                        until = to_date,
-                        show_description_from_api_doc = False)
+                            id = page_id,
+                            connection_name = connection_name,
+                            metric = metric,
+                            period = period,
+                            since = from_date,
+                            until = to_date,
+                            show_description_from_api_doc = False)
 
-        # page_cta_clicks_logged_in_unique
         dfs = page_insights['data']
         return dfs
 
@@ -197,8 +246,6 @@ if __name__=='__main__':
     to_date = datetime(2021, 3, 1)
     pg = Pages()
 
-    dfs = pg.PageInsights(graph, from_date, to_date)
+    pg.PageInsights(graph, from_date, to_date)
     dfs = pg.PageConsumptions(graph, from_date, to_date)
-    dfs = pg.PageFansGenderAge(graph, from_date, to_date)
-    
-    #asd = pg.SaveToDB(flat)
+    pg.PageFansGenderAge(graph, from_date, to_date)
