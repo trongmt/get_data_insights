@@ -247,5 +247,5 @@ if __name__=='__main__':
     pg = Pages()
 
     pg.PageInsights(graph, from_date, to_date)
-    dfs = pg.PageConsumptions(graph, from_date, to_date)
+    # dfs = pg.PageConsumptions(graph, from_date, to_date)
     pg.PageFansGenderAge(graph, from_date, to_date)
