@@ -47,7 +47,7 @@ class Posts:
 
     def FlattenPost(self, df):
         flattened_data =[]
-        devices = get_values(df)
+        devices = self.ParserPost(df)
 
         for device in devices:
             date,message,id = device
@@ -73,7 +73,7 @@ class Posts:
     
     def FlattenPostInsight(self, df):
         flattened_data =[]
-        devices = get_values(df)
+        devices = self.ParserPostInsight(df)
 
         for device in devices:
             id, period, name, value, title, description = device
@@ -105,7 +105,7 @@ class Posts:
     
     def FlattenPostClicks(self, df, orgPostid):
         flattened_data =[]
-        devices = get_values(df)
+        devices = self.ParserPostClicks(df)
 
         for device in devices:
             id, period, name, title, description, LinkClicks, OtherClicks, PhotoView, VideoPlay = device
@@ -133,13 +133,13 @@ class Posts:
                 
         return devices
      
-    def FlattenPostActivity(self, df):
+    def FlattenPostActivity(self, df,orgPostid):
         flattened_data =[]
-        devices = get_values(df)
+        devices = self.ParserPostActivity(df)
 
         for device in devices:
             id, period, name, title, description, share, like, comment= device
-            flattened_data.append([id, period, name, title, description, share, like, comment])
+            flattened_data.append([id, period, name, title, description, share, like, comment, orgPostid])
         return flattened_data
 
     def SaveToDB(self, sql, headers):
@@ -167,7 +167,7 @@ class Posts:
             conn = self.ConnectionSqlDb(conn_str_config)
             cur = conn.cursor()
 
-            sql = f"delete from dbo.{table_name} where end_time between '{from_date}' and '{to_date}'"
+            sql = f"delete from dbo.{table_name} where PostDate between '{from_date}' and '{to_date}'"
             cur.execute(sql)
             
             conn.commit()
@@ -178,21 +178,89 @@ class Posts:
             if conn is not None:
                 self.ConnectToClose(conn)
     
-    def Post(self, graph):
-        post = self.
+    def Post(self, graph, from_date, to_date):
+        self.PrepareData('Post', from_date, to_date)
+        all_post = graph.get_all_connections(id=page_id,connection_name='posts',since=from_date,until=to_date)
+        for ind, post in enumerate(all_post):        
+            # post = self.PostConnection(graph, page_id, 'posts', from_date, to_date)
+            # self.PrepareData('Post', from_date, to_date)
 
+            flat = self.FlattenPost(post)
+            for row in flat:
+                # print(row)
+                sql = "insert into dbo.Post (PostDate, Message, ID) values (?,?,?) "
+                header=(row[0], row[1], row[2])
 
-    def PostInsight():
+                self.SaveToDB(sql, header)
 
+    def PostInsight(self,graph):
+        # get post id from db
+        conn = None
+        conn = self.ConnectionSqlDb(conn_str_config)
+        cur = conn.cursor()
+        cur.execute("select Post.ID from Post left join PostInsight on Post.ID = PostInsight.ID where PostInsight.ID is null order by PostDate desc")
+        lstPostIds = cur.fetchall()
 
-    def PostClicks():
-
+        for postId in lstPostIds:
     
-    def PostActivity():
+            metric= '''
+                post_engaged_users,
+                post_engaged_fan,post_clicks,post_clicks_unique,
+                post_impressions,post_impressions_unique,post_impressions_paid,
+                post_impressions_paid_unique,post_impressions_fan,post_impressions_fan_unique,
+                post_activity'''
+            dfs = self. GraphConnection(graph, postId[0], 'insights', metric, 'lifetime')
+            flat = self.FlattenPostInsight(dfs)
 
+            for row in flat:
+                # print(row)
+                sql = "insert into dbo.PostInsight (ID, Period, Name, Value, Title, Description) values (?,?,?,?,?,?) "
+                header=(row[0], row[1], row[2], row[3], row[4], row[5])
+                self.SaveToDB(sql, header)
+
+    def PostClick(self, graph):
+        conn = None
+
+        conn = self.ConnectionSqlDb(conn_str_config)
+        cur = conn.cursor()
+        cur.execute("select Post.ID from Post left join PostClick on Post.ID = PostClick.ID where PostClick.ID is null order by PostDate desc")
+        lstPostIds = cur.fetchall()
+
+        for postId in lstPostIds:
+            dfs = self. GraphConnection(graph, postId[0], 'insights', 'post_clicks_by_type', 'lifetime')
+            flat = self.FlattenPostClicks(dfs,postId[0])
+
+            cursor1 = conn.cursor()
+            sql = "insert into dbo.PostClick (ID, Period, Name, Title, Description, LinkClicks, OtherClicks, PhotoView, VideoPlay, PostID) values (?,?,?,?,?,?,?,?,?,?)"
+            cursor1.fast_executemany = True
+            params = list(tuple(record) for record in flat)
+            cursor1.executemany(sql, params)
+            
+            cursor1.commit()
+            cursor1.close()
     
+    def PostActivity(self, graph):
+        conn = None
+
+        conn = self.ConnectionSqlDb(conn_str_config)
+        cur = conn.cursor()
+        cur.execute("select Post.ID from Post left join PostActivity on Post.ID = PostActivity.ID where PostActivity.ID is null order by PostDate desc")
+        lstPostIds = cur.fetchall()
+
+        for postId in lstPostIds:
+            dfs = self. GraphConnection(graph, postId[0], 'insights', 'post_activity_by_action_type', 'lifetime')
+            flat = self.FlattenPostActivity(dfs,postId[0])
+
+            cursor1 = conn.cursor()
+            sql = "insert into dbo.PostActivity (ID, Period, Name, Title, Description, Share, [Like], Comment, PostID) values (?,?,?,?,?,?,?,?,?)"
+            cursor1.fast_executemany = True
+            params = list(tuple(record) for record in flat)
+            cursor1.executemany(sql, params)
+            
+            cursor1.commit()
+            cursor1.close()
     
-    def GraphConection(self, graph, post_id, connection_name, metric, period):
+    def GraphConnection(self, graph, post_id, connection_name, metric, period):
         post_insights = graph.get_connections(
                             id = post_id,
                             connection_name = connection_name,
@@ -201,4 +269,20 @@ class Posts:
                             show_description_from_api_doc = False)
 
         dfs = post_insights['data']
-        return dfs       
+        return dfs
+
+if __name__=='__main__':
+    # proxies = {
+    #     "http": "172.16.0.53:8080",
+    #     "https": "172.16.0.53:8080"
+    # }
+    # graph = fb.GraphAPI(access_token=page_token, version="3.1",  proxies=proxies)
+    graph = fb.GraphAPI(access_token = page_token, version="3.1")
+    from_date = datetime(2020, 12, 31)
+    to_date = datetime(2021, 4, 1)
+    ps = Posts()
+
+    ps.Post(graph, from_date, to_date)
+    ps.PostInsight(graph)
+    ps.PostClick(graph)
+    ps.PostActivity(graph)
