@@ -43,6 +43,8 @@ CREATE TABLE [dbo].[PageInsight](
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
+alter table [PostInsight] add PostID varchar(100);
+
 /****** Object:  Table [dbo].[Post]    Script Date: 4/14/2021 10:29:42 AM ******/
 SET ANSI_NULLS ON
 GO
