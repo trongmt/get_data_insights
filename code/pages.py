@@ -91,40 +91,6 @@ class Pages:
             id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7 = device
             flattened_data.append([id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7])
         return flattened_data
-
-    def ParserConsumption(self, data):
-        devices = []
-
-        for datum in data:
-            for i in range(len(datum["values"])):
-                id = datum["id"]
-                name = datum["name"]
-                period = datum["period"]
-                title = datum["title"]
-                description = datum["description"]
-                end_time = datum["values"][i]["end_time"]
-                end_time = end_time.split('T')
-                end_time = end_time[0]
-                value = datum["values"][i]["value"]
-
-                if len(value) >= 1:
-                    video_play = value['video play'] if 'video play' in value else 0
-                    other_clicks = value['other clicks'] if 'other clicks' in value else 0
-                    photo_view = value['photo view'] if 'photo view' in value else 0
-                    link_clicks = value['link clicks'] if 'link clicks' in value else 0
-
-                    devices.append([id, period, name, end_time, title, description, link_clicks, other_clicks, photo_view, video_play])
-    return devices
-
-    def FlattenConsumption(self, df):
-        flattened_data =[]
-        devices = get_values(df)
-
-        for device in devices:
-            id, period, name, end_time, title, description, link_clicks, other_clicks, photo_view, video_play = device
-            flattened_data.append([id, period, name, end_time, title, description, link_clicks, other_clicks, photo_view, video_play])
-        
-        return flattened_data
         
     def SaveToDB(self, sql, headers):
         conn = None
@@ -151,7 +117,7 @@ class Pages:
             conn = self.ConnectionSqlDb(conn_str_config)
             cur = conn.cursor()
 
-            sql = f"delete from dbo.{table_name} where end_time between '{from_date}' and '{to_date}'"
+            sql = f"delete from dbo.{table_name} where EndTime between '{from_date}' and '{to_date}'"
             cur.execute(sql)
             
             conn.commit()
@@ -174,51 +140,37 @@ class Pages:
                     page_video_views,
                     page_fan_adds_unique,
                     page_fan_removes_unique'''
-        page_insights = self.GraphConnection(graph, page_id, 'insights', metric, 'day', from_date, to_date)
+        dfs = self.GraphConnection(graph, page_id, 'insights', metric, 'day', from_date, to_date)
         
-        dfs = page_insights['data']
-        self.PrepareData('page_insight', from_date, to_date)
+        # dfs = page_insights['data']
+        self.PrepareData('PageInsight', from_date, to_date)
 
         flat = self.FlattenInsights(dfs)
         for row in flat:
-            sql = '''insert into dbo.page_insight 
-                           (id, period, name, value, end_time, title, description) 
+            sql = '''insert into dbo.PageInsight 
+                           (ID, Period, Name, Value, EndTime, Title, Description) 
                     values (?,?,?,?,?,?,?)
                 '''
             header = (row[0], row[1], row[2], row[3], row[4], row[5], row[6])
 
             self.SaveToDB(sql, header)        
 
-    def PageConsumptions(self, graph, from_date, to_date):
-        page_insights = self.GraphConnection(graph, page_id, 'insights', 'page_consumptions_by_consumption_type', 'day', from_date, to_date)
-
-        dfs = page_insights['data']
-        self.PrepareData('page_consumptions_by_type', from_date, to_date)
-        
-        flat = self.FlattenConsumption(dfs)
-        for row in flat:
-            sql = '''insert into dbo.page_consumptions_by_type 
-                               (id, period, name, end_time, title, description, link_clicks, other_clicks, photo_view, video_play)
-                        values (?,?,?,?,?,?,?,?,?,?)
-                '''        
-            header = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9])
-            
-            self.SaveToDB(sql, header)
-
-
     def PageFansGenderAge(self, graph, from_date, to_date):
-        page_insights = self.GraphConnection(graph, page_id, 'insights', 'page_fans_gender_age', 'day', from_date, to_date)
+        dfs = self.GraphConnection(graph, page_id, 'insights', 'page_fans_gender_age', 'day', from_date, to_date)
 
-        dfs = page_insights['data']
-        self.PrepareData('page_fans_gender_age', from_date, to_date)
+        # dfs = page_insights['data']
+        self.PrepareData('PageFans', from_date, to_date)
 
         flat = self.FlattenFanGender(dfs)
-        for row in flat:
-            sql = '''insert into dbo.page_fans_gender_age 
-                           (id, period, name, end_time, title, description,F1,F2,F3,F4,F5,F6,F7,M1,M2,M3,M4,M5,M6,M7) 
-                    values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        flat = pd.DataFrame(flat,columns=['ID','Period','Name','EndTime','Title','Description','F1','F2','F3','F4','F5','F6','F7','M1','M2','M3','M4','M5','M6','M7'])
+        flat=pd.melt(flat,id_vars = ['ID','Period','Name','EndTime','Title','Description'],value_vars=['F1','F2','F3','F4','F5','F6','F7','M1','M2','M3','M4','M5','M6','M7'],var_name='Attribute', value_name='Value')
+        
+        for index,row in flat.iterrows():
+            sql = '''insert into dbo.PageFans 
+                            (ID, Period, Name, EndTime, Title, Description, Attribute, Value) 
+                    values (?,?,?,?,?,?,?,?)
                 '''
-            header = (row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], row[11], row[12], row[13], row[14], row[15], row[16], row[17], row[18], row[19])
+            header = (row.ID,row.Period,row.Name,row.EndTime,row.Title,row.Description,row.Attribute,row.Value)
             
             self.SaveToDB(sql, header)
 
@@ -247,5 +199,4 @@ if __name__=='__main__':
     pg = Pages()
 
     pg.PageInsights(graph, from_date, to_date)
-    # dfs = pg.PageConsumptions(graph, from_date, to_date)
     pg.PageFansGenderAge(graph, from_date, to_date)
