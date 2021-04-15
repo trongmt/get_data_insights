@@ -7,6 +7,7 @@ from datetime import datetime
 import pandas as pd
 from pandas.io.json import json_normalize
 import pyodbc
+import sys
 
 page_id='217328504988428'
 page_token = 'EAAyBEgkHZCbYBANms9s1kPc3Fwrw3fr9OfZCRDIlJT1hQTfhzlidpUt3irjLqd4EjI4F1KYlEbBkHGm1obIJ1iZC7Hf8da9aU7ZAJsOGCPFlDhUKTM32yr6tJmsPmdhFurmipGis6YxHdQYLdEUZBzuITg1Ynzl6C4w3PzxhJfQZDZD'
@@ -165,7 +166,8 @@ class Pages:
                     page_post_engagements,
                     page_video_views,
                     page_fan_adds_unique,
-                    page_fan_removes_unique'''
+                    page_fan_removes_unique
+                '''
         page_insights = self.GraphConnection(page_id, 'insights', metric, 'day', from_date, to_date)
         self.PrepareData('PageInsight', from_date, to_date)
 
@@ -209,8 +211,10 @@ class Pages:
         return dfs
 
 if __name__=='__main__':
-    from_date = datetime(2021, 3, 30)
-    to_date = datetime(2021, 4, 1)
+    # from_date = datetime(2021, 4, 1)
+    # to_date = datetime(2021, 5, 1)
+    from_date = sys.argv[1]
+    to_date = sys.argv[2]
     pg = Pages()
 
     pg.PageInsights(from_date, to_date)

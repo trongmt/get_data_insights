@@ -61,8 +61,14 @@ set /A dd=29 + %dd%
 if /i %dd% LSS 10 set dd=0%dd%
 if /I %mm% LSS 10 set mm=0%mm%
 set fromdate=%yyyy%-%mm%-%dd% 00:00:00
+REM set /A dd=%dd% + 5
 set todate=%yyyy%-%mm%-%dd% 23:59:59
+
 
 echo fromdate: %fromdate%
 echo todate: %todate%
-python D:\GitHub\get_data_insights\code\mssql_page_insight.py '%fromdate%' '%todate%'
+
+cd D:\WORKING\GitHub\get_data_insights\code
+d:
+python -u "pages.py" "%fromdate%" "%todate%"
+python -u "posts.py" "%fromdate%" "%todate%"

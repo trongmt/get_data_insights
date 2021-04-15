@@ -1,9 +1,13 @@
+#!C:\ProgramData\Miniconda3\python
+# -*- coding: utf-8 -*-
+
 import json
 import facebook as fb
 from datetime import datetime
 import pandas as pd
 from pandas.io.json import json_normalize
 import pyodbc
+import sys
 
 proxies = {
         "http": "172.16.0.53:8080",
@@ -275,9 +279,11 @@ class Posts:
         dfs = post_insights['data']
         return dfs
 
-if __name__=='__main__':    
-    from_date = datetime(2021, 3, 30)
-    to_date = datetime(2021, 4, 1)
+if __name__=='__main__':
+    # from_date = datetime(2021, 4, 1)
+    # to_date = datetime(2021, 5, 1)
+    from_date = sys.argv[1]
+    to_date = sys.argv[2]
     ps = Posts()
 
     ps.Post(from_date, to_date)
