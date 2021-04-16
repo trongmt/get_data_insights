@@ -191,7 +191,7 @@ class Posts:
             conn = self.ConnectionSqlDb(conn_str_config)
             cur = conn.cursor()
 
-            sql = f"delete from dbo.{table_name} where PostDate between '{from_date}' and '{to_date}'"
+            sql = f"delete from dbo.{table_name} where PostDate > '{from_date}' and PostDate < '{to_date}'"
             cur.execute(sql)
             
             conn.commit()

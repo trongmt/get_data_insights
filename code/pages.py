@@ -40,7 +40,7 @@ class Pages:
             conn = self.ConnectionSqlDb(conn_str_config)
             cur = conn.cursor()
 
-            sql = f"delete from dbo.{table_name} where EndTime between '{from_date}' and '{to_date}'"
+            sql = f"delete from dbo.{table_name} where EndTime > '{from_date}' and EndTime < '{to_date}'"
             cur.execute(sql)
             
             conn.commit()
