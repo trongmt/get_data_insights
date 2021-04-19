@@ -3,7 +3,7 @@
 
 import json
 import facebook as fb
-from datetime import datetime
+import datetime
 import pandas as pd
 from pandas.io.json import json_normalize
 import pyodbc
@@ -40,7 +40,7 @@ class Pages:
             conn = self.ConnectionSqlDb(conn_str_config)
             cur = conn.cursor()
 
-            sql = f"delete from dbo.{table_name} where EndTime > '{from_date}' and EndTime < '{to_date}'"
+            sql = f"delete from dbo.{table_name} where EndTime between '{from_date}' and '{to_date}'"
             cur.execute(sql)
             
             conn.commit()
@@ -213,8 +213,11 @@ class Pages:
 if __name__=='__main__':
     # from_date = datetime(2021, 4, 1)
     # to_date = datetime(2021, 5, 1)
-    from_date = sys.argv[1]
-    to_date = sys.argv[2]
+    vdate = datetime.datetime.now()
+    from_date = (vdate + datetime.timedelta(days=-1) ).strftime('%Y-%m-%d')
+    to_date = vdate.strftime('%Y-%m-%d')
+    # print(from_date)
+    # print(to_date)
     pg = Pages()
 
     pg.PageInsights(from_date, to_date)
